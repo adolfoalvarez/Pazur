@@ -1,0 +1,7 @@
+---
+title: "useful links"
+output: html_document
+---
+
+<http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/>.
+
