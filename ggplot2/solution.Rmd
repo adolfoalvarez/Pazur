@@ -1,0 +1,17 @@
+---
+title: "Solution ggplot"
+output: html_document
+---
+
+
+
+```{r}
+data=read.table("http://dl.dropbox.com/u/8922850/ex2.txt",header=T)
+p<- ggplot(data, aes(x=explanatory ,
+                     y=response,color=Gender)) 
+p<- p + facet_grid(~Country) +
+  geom_point() + 
+  stat_smooth(method=lm)+
+  theme(legend.position = c(0.15,0.25))
+print(p)
+```
