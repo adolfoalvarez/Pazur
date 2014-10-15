@@ -1,0 +1,14 @@
+---
+title: "solution"
+output: html_document
+---
+
+```{r, eval=FALSE}
+library(gcookbook)
+countries %>%
+  filter(Year==2009, healthexp>2000) %>%
+  ggvis(x= ~healthexp, y= ~infmortality) %>%
+  layer_points() %>%
+  layer_text(y = ~infmortality+0.1, text := ~as.character(Name), align:="center")
+
+```
