@@ -1,0 +1,8 @@
+---
+title: "Ankieta"
+output: html_document
+---
+
+Please complete the evaluation at:
+<http://tnij.org/pazurankieta>.
+
