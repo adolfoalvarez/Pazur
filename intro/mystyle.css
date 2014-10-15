@@ -1,0 +1,9 @@
+slides > slide[data-slide-num= "2"]
+{
+  background-color: #000000;
+}
+
+  slides > slide[data-slide-num= "5"]
+{
+  background-image: url(cat.png);
+}

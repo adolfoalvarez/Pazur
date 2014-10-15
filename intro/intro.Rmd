@@ -1,0 +1,112 @@
+---
+title: "Data visualization in R"
+author: Adolfo Alvarez
+date: "14/10/2014"
+output: 
+  ioslides_presentation:
+    css: mystyle.css
+widescreen: true
+---
+
+## 
+<style>
+myintro{
+  font-style:italic;
+  font-family: 'Open Sans Condensed';
+  color: #e6e6e6;
+  font-size: 200px;
+  line-height:150%;
+  font-weight: bold;
+  text-transform: normal;  
+}
+
+</style>
+<myintro> Why R to plot?</myintro>
+
+
+## Three Reasons:
+  
+ >- *Practical*: R is the "de facto" programming language for data analysis. Plot your data where your data lives.
+(Have you ever tried to make a simple scatterplot with labels in Excel? I hope not...)
+ >- *Flexibility*: R has a wide broad of graphical tools and constantly evolving
+ >- *Aesthetics*: R graphics are beautiful, although this is subjective!
+
+
+## Do's and don'ts
+  
+Sense of aesthetics is hard to get. But it can be developed by reading books such as:
+
+ - <a href = "http://www.edwardtufte.com/tufte/books_vdqi" target="_blank">The visual display of quantitative information</a>
+ - <a href = "http://www.amazon.es/Visualize-This-Nathan-Yau/dp/3527760229/" target="_blank">Visualize This!</a>
+ - <a href = "http://www.amazon.es/Data-Points-Visualization-Means-Something/dp/111846219X" target="_blank">Data Points: Visualization That Means Something </a>
+
+##
+<style>
+cat1 {
+  text-shadow: 0 0 2px #000000; /* #193441;*/
+  font-family: 'Open Sans Condensed';
+  font-size: 60px;
+  font-style: normal;
+  font-weight: bold;
+  text-transform: normal;
+/* letter-spacing: -2px;*/
+  line-height: 0.8em;
+/*  word-spacing:-30px;*/
+  text-align: center;
+/*  color: #193441;*/
+/*  color: #02574D;*/
+/*  color: #2f4f4f;*/
+  color: #ffffff;
+/* color: #ffffff;*/
+  position: absolute;
+/*  top: 50px; */
+  bottom: 160px; 
+  left: 50px;
+/*  right:120px;*/
+/*  width:700px;*/
+/*  margin-left:auto;*/
+/*  margin-right:auto;*/
+/*  width:70%;*/
+}
+</style>
+
+<cat1>DON'T...</cat1>
+
+## ... use 3D pie charts
+<iframe src = 'http://files.chandoo.org/video/why-3d-pie-charts-can-be-evil/why-3d-pie-charts-can-be-evil_player.html' height='600px'></iframe>
+
+## ... use pie charts at all
+<iframe src = 'https://blogs.oracle.com/experience/entry/countdown_of_top_10_reasons_to_never_ever_use_a_pie_chart' height='600px'></iframe>
+
+## ... manipulate the scales
+<style>
+IMG.displayed {
+    display: block;
+    margin-left: auto;
+    margin-right: auto 
+    }
+</style>
+
+<IMG class="displayed" src="paro.jpg" alt="paro">
+(**Real decrease: 250630 -> 235049**)
+
+## ... use two vertical axis
+<IMG class="displayed" src="inflation.png" alt="inflation">
+
+(You can create a spurious correlation between any mononote series)
+
+## More (bad) examples
+
+<iframe src = 'http://data.heapanalytics.com/how-to-lie-with-data-visualization/' height='600px'></iframe>
+
+## The R graphics ecosystem
+
+  - Basic plots <a href = "http://www.statmethods.net/graphs/" target="_blank">http://www.statmethods.net/graphs/</a>
+  - ggplot2 <a href = "http://ggplot2.org/" target="_blank">http://ggplot2.org/</a>
+  - lattice <a href = "http://lattice.r-forge.r-project.org/" target="_blank">http://lattice.r-forge.r-project.org/</a>
+  - ggvis <a href = "http://ggvis.rstudio.com/" target="_blank">http://ggvis.rstudio.com/</a>
+  - bigvis <a href = "https://github.com/hadley/bigvis" target="_blank">https://github.com/hadley/bigvis</a>
+  - rCharts <a href = "http://rcharts.io/" target="_blank">http://rcharts.io/</a>
+  - plotly <a href = "https://plot.ly/r/" target="_blank">https://plot.ly/r/</a>
+  - googleVis: <a href = "https://github.com/mages/googleVis" target="_blank">https://github.com/mages/googleVis</a>
+  - and others: circleplots, ggmaps, lively, etc...

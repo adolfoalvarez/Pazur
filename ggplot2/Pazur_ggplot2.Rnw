@@ -1,0 +1,718 @@
+% this is a simplified version of
+% https://github.com/yihui/knitr/blob/master/inst/examples/knitr-beamer.Rnw
+\documentclass{beamer}
+\mode<presentation>
+{
+  \usetheme{Boadilla}
+  \usecolortheme{seahorse}%seahorse
+  \setbeamercovered{transparent}
+}
+\usepackage{multicol}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+%\usepackage{Sweave}
+\usepackage{framed}
+
+\institute[Analyx]
+
+\date[October 2014] % (optional)
+{Polski Akademicki Zlot Uzytkownik\'{o}w R}
+
+\subject{Talks}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=2cm]{analyx-logo}{analyx-white.png}
+% \logo{\pgfuseimage{analyx-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection]
+%  \end{frame}
+%}
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+\tableofcontents[currentsection]
+%    \tableofcontents[sectionstyle=show/hide,subsectionstyle=hide/show/hide]
+  \end{frame}
+  \addtocounter{framenumber}{-1}% If you don't want them to affect the slide number
+  \stepcounter{subsection}
+}
+
+\begin{document}
+
+{
+\usebackgroundtemplate{\includegraphics[width=\paperwidth]{analyx.png}}
+\begin{frame}[plain]
+\end{frame}
+}
+
+<<setup, include=FALSE>>=
+# smaller font size for chunks
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+@
+\title{Introduction to ggplot2}
+\author{Adolfo \'{A}lvarez}
+ 
+\maketitle
+ 
+% very important to use option [fragile] for frames containing code output!
+ 
+ \begin{frame}{Outline}
+  \tableofcontents
+  % You might wish to add the option [pausesections]
+\end{frame}
+
+\begin{frame}{Why are we here?}
+\begin{itemize}
+\item Graphs allow for a quick inspection of the data, e.g., results
+of a recently-completed simulation study
+\item For business: graphs appear in internal reports
+\item and they are crucial to show results to clients
+\item for Academia, integrate graphics within the analysis software is key for reproducibility
+\item and papers need plots too! 
+\end{itemize}
+\begin{block}{What do we want?}
+We are interested in producing high-quality graphs, often
+multipanel ones, with just few lines of code.
+\begin{flushright}
+\textit{A. Jach, 2011}
+\end{flushright}
+\end{block}
+\end{frame}
+
+
+\begin{frame}{What is ggplot2}
+\begin{block}{}
+\begin{quotation}
+ggplot2 is an R package for producing statistical, or data, graphics. Provides beautiful, hassle-free plots, that take care of
+fiddly details like drawing legends. The plots can be built up iteratively and edited later.
+%\linebreak 
+\begin{flushright}
+H. Wickham, ``ggplot2''
+\end{flushright}
+
+\end{quotation}
+\end{block} \pause
+  \begin{itemize}
+  \item
+  Is unlike most other graphics packages because it has a deep underlying
+grammar
+%Use \texttt{itemize} a lot.
+\pause
+  \item
+   This grammar is composed of a set of independent components that can be also composed in many different ways. \pause
+  \item
+   You are not limited to a set of pre-specified graphics, but you can create new graphics that are precisely tailored for your problem. \pause
+  \item	
+	 Instead of spending time making your graph look
+pretty, you can focus on creating a graph that best reveals the messages in
+your data.
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{How to install it}
+ggplot2 is an R package, so is installed in the usual way:
+\begin{itemize}
+\item \texttt{install.packages("ggplot2")}
+\end{itemize}
+And loading it with:
+\begin{itemize}
+\item \texttt{library(ggplot2)}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The ggplot2 grammar}
+\begin{itemize}
+
+\item  The \textbf{data} is what we want to visualize. It consists of variables, which are stored as columns in a data frame.
+\item \textbf{Geoms} are the geometric objects that are drawn to represent the data, such as bars, lines, and points.
+\item Aesthetic attributes, or \textbf{aesthetics}, are visual properties of geoms, such as x and y position, line color, point shapes, etc.
+\item Statistical transformations, \textbf{stats} for short, summarise data in many useful ways.
+\item There are \textbf{mappings} from data values to aesthetics.
+\item  \textbf{Scales} control the mapping from the values in the data space to values in the aesthetic space. 
+\item \textbf{Guides }show the viewer how to map the visual properties back to the data space. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The ggplot2 grammar}
+You have \textbf{data}, which is a set of numerical or categorical values. You have \textbf{geoms} to represent each observation. You have an \textbf{aesthetic}, such as y (vertical) position. And you have a \textbf{scale}, which defines the mapping
+from the data space (numeric values) to the aesthetic space (vertical position). A typical linear y-scale might map the value 0 to the baseline of the graph, 5 to the middle, and 10 to the top. A logarithmic y scale would place them differently.
+\end{frame}
+
+\section{The qplot function}
+
+\begin{frame}[containsverbatim]{Preparing the dataset}
+To introduce the qplot function we will use the diamonds dataset consisting of prices and quality information about 54,000 diamonds, and is included in the ggplot2 package. The data contains the four C\'{}s of diamond quality, carat, cut, colour and clarity; and five physical measurements, depth, table, x, y and z.
+<<echo=FALSE,results='hide'>>=
+library(ggplot2)
+options( warn = -1 )
+@
+<<echo=FALSE>>=
+head(diamonds)
+@
+\end{frame}
+
+\begin{frame}[containsverbatim]{Preparing the dataset}
+We will use a small sample of the \texttt{diamonds} dataset:
+<<results='hide'>>=
+dsmall <- diamonds[sample(nrow(diamonds), 100), ]
+@
+\end{frame}
+
+\begin{frame}[containsverbatim]{Scatterplots}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+plot(dsmall$carat, dsmall$price)
+@
+\begin{columns}[t] 
+  \column{0.65\textwidth}
+\begin{minipage}{1\textwidth}
+%\begin{framed}
+\setkeys{Gin}{width=1\textwidth}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=12, fig.height=10>>=
+plot(dsmall$carat, dsmall$price)
+@
+\end{figure}
+% \end{framed}
+ \end{minipage}
+\column{0.35\textwidth}
+\begin{minipage}{1\textwidth}
+A scatterplot from the "base" package. 
+\end{minipage}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[containsverbatim]{Scatterplots}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+qplot(dsmall$carat, dsmall$price)
+@
+\begin{columns}[t] 
+  \column{0.65\textwidth}
+\begin{minipage}{1\textwidth}
+%\begin{framed}
+\setkeys{Gin}{width=1\textwidth}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=12, fig.height=10>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p=qplot(dsmall$carat, dsmall$price, size=I(4))+
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+% \end{framed}
+ \end{minipage}
+\column{0.35\textwidth}
+\begin{minipage}{1\textwidth}
+The qplot ("quick plot") function allows to use the power of ggplot using a similar grammar as the base command \texttt{plot}
+\end{minipage}
+\end{columns}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Scatterplots}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+qplot(log(carat), log(price), data = dsmall)
+@
+\begin{columns}[t] 
+  \column{0.65\textwidth}
+\begin{minipage}{1\textwidth}
+%\begin{framed}
+\setkeys{Gin}{width=1\textwidth}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=12, fig.height=10>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p=qplot(log(carat), log(price), data = dsmall,size=I(4))+
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+% \end{framed}
+ \end{minipage}
+\column{0.35\textwidth}
+\begin{minipage}{1\textwidth}
+It also allows to define the data set where to extract the variables from, and the transformation of the data inside the function call.
+\end{minipage}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[containsverbatim]{Controlling shape and color}
+Is also possible to control the shape and color in the following way:
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+qplot(carat, price, data = dsmall, colour = color)
+qplot(carat, price, data = dsmall, shape = cut)
+@
+\begin{columns}[t] 
+\column{0.5\textwidth}  
+\begin{framed}
+ \begin{minipage}{1\textwidth}
+\begin{figure}[!t]
+\centering
+<<echo=FALSE, fig.width=8, fig.height=8>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p=qplot(carat, price, data = dsmall, colour = color, size=I(4))+
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+ \end{minipage}
+ \end{framed}
+
+\column{0.5\textwidth}  
+\begin{framed}
+ \begin{minipage}{1\textwidth}
+\begin{figure}[!t]
+\centering
+<<echo=FALSE, fig.width=8, fig.height=8>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p=qplot(carat, price, data = dsmall, shape = cut, size=I(4))+
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+ \end{minipage}
+ \end{framed}
+\end{columns}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Geometric objects }
+The geometric objects are controlled in ggplot2 via the ``geom = ...'' parameter. The most typical cases are:
+\begin{itemize}
+\item "point" draws points to produce a scatterplot. (default)
+\item "smooth" fits a smoother to the data and displays the smooth and
+its standard error
+\item "boxplot" produces a box-and-whisker plot to summarise the
+distribution of a set of points.
+\item "path" and "line" draw lines between the data points. A line plot is constrained to produce lines that travel from left to right, while paths can go in any direction.
+\item "histogram" draws a histogram
+\item "freqpoly" produces a frequency polygon
+\item "density" creates a density plot
+\item For discrete variables, "bar" makes a bar chart.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Geometric objects}
+<<echo=TRUE, eval=FALSE, results='hide', fig.keep='none'>>=
+qplot(carat, price, data = dsmall, 
+geom = c("point", "smooth"))
+@
+\begin{columns}[t] 
+  \column{0.65\textwidth}
+\begin{minipage}{1\textwidth}
+%\begin{framed}
+\setkeys{Gin}{width=1\textwidth}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=12, fig.height=10, warnings=FALSE>>=
+p=qplot(carat, price, data = dsmall, geom = c('point', 'smooth'))+
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+suppressMessages(print(p))
+@
+\end{figure}
+% \end{framed}
+ \end{minipage}
+\column{0.35\textwidth}
+\begin{minipage}{1\textwidth}
+%\begin{footnotesize}
+Example of the "smooth" interpolation. The default option is "loess", for linear model use: \texttt{qplot(..., 
+geom=c("point",
+"smooth"),
+method="lm")}.
+%\end{footnotesize}
+\end{minipage}
+\end{columns}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Geometric objects}
+Example of the use of different geometric objects:
+\begin{itemize}
+\item \texttt{qplot(color, price / carat, data = diamonds, geom = "boxplot")}
+\item \texttt{qplot(carat, data = diamonds, geom = "histogram")}
+\item  \texttt{qplot(carat, data = diamonds, geom = "density")}
+\item \texttt{qplot(color, data = diamonds, geom = "bar")}
+\item \texttt{qplot(date, uempmed, data = economics, geom = "line")}
+date
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[containsverbatim]{Other options for qplot}
+There exists equivalent to base plot function options to set plot parameters in qplot:
+\begin{itemize}
+\item \textbf{xlim, ylim}: set limits for the x- and y-axes, each a numeric vector of length two, e.g., xlim=c(0, 20) or ylim=c(-0.9, -0.5).
+\item \textbf{log}: a character vector indicating which (if any) axes should be logged. For example, log="x" will log the x-axis, log="xy" will log both.
+\item  \textbf{main}: main title for the plot, centered in large text at the top of the plot. This can be a string (e.g., main="plot title") or an expression (e.g., main = expression(beta[1] == 1)). See ?plotmath for more examples of using mathematical formulae.
+\item \textbf{xlab, ylab}: labels for the x- and y-axes. As with the plot title, these can be character strings or mathematical expressions.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Example}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+qplot(
+carat, price/carat, data = dsmall,
+ylab = expression(frac(price,carat)),
+xlab = "Weight (carats)",
+main="Small diamonds",
+xlim = c(.2,1)
+)
+@
+\end{frame}
+
+\begin{frame}[containsverbatim]{Example}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=16, fig.height=10, messages=FALSE, warnings=FALSE>>=
+  #par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+  p=qplot(
+    carat, price/carat, data = dsmall,
+    ylab = expression(frac(price,carat)),
+    xlab = "Weight (carats)",
+    main="Small diamonds",
+    xlim = c(.2,1)
+  )+
+  theme(
+    axis.title.x = element_text(size=24),
+    axis.text.x = element_text(size=24),
+    axis.title.y = element_text(size=24, angle = 90),
+    axis.text.y = element_text(size=24)
+  )
+#print(p)
+print(p + theme_grey(base_size=24))
+@
+  \end{figure}
+\end{frame}
+
+\section{The ggplot function}
+
+\begin{frame}[containsverbatim]{Preparing the dataset}
+To introduce the ggplot function we will use the mpg dataset (among others) check \texttt{?mpg} for details...
+%<<echo=TRUE,results=hide>>=
+<<>>=
+str(mpg)
+@
+\end{frame}
+
+\begin{frame}[containsverbatim]{The ggplot function}
+Despite qplot allows to get the power of ggplot in a "quick" way, sometimes we need to control more details of the plot. The ggplot function allows us to built our graphs in a step-by-step way.
+
+
+All ggplot2 plots begin with the function ggplot(). ggplot() takes two primary arguments:
+\begin{itemize}
+\item \textbf{data} The data frame containing the data to be plotted
+\item \textbf{aes()}The aesthetic mappings to pass on to the plot elements
+\end{itemize}
+<<>>=
+p <- ggplot(mpg, aes(displ, hwy))
+@
+\end{frame}
+
+\begin{frame}[containsverbatim]{The ggplot function}
+The plot is still not ready, we only told to ggplot the dataset and the aesthetic, but to produce a result, we need to add a geometry.
+\begin{columns}[t] 
+  \column{0.65\textwidth}
+\begin{minipage}{1\textwidth}
+%\begin{framed}
+\setkeys{Gin}{width=1\textwidth}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=12, fig.height=10>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p <- p + geom_point() +
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+% \end{framed}
+ \end{minipage}
+\column{0.35\textwidth}
+\begin{minipage}{1\textwidth}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+p + geom_point()
+@
+\end{minipage}
+\end{columns}
+\end{frame}
+
+\begin{frame}[containsverbatim]{The ggplot function}
+We can also include different shapes or color for the points, depending on our variables, inside the \texttt{aes()} function 
+\begin{small}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+ggplot(mpg, aes(displ, hwy, color=factor(cyl)))+ geom_point()
+ggplot(mpg, aes(displ, hwy))+ geom_point(aes(shape=factor(cyl)))
+@
+\end{small}
+\begin{columns}[t] 
+\column{0.5\textwidth}  
+\begin{framed}
+ \begin{minipage}{0.8\textwidth}
+\begin{figure}[!t]
+\centering
+<<echo=FALSE, fig.width=8, fig.height=8>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p=ggplot(mpg, aes(displ, hwy, color=factor(cyl)))+ geom_point() +
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+ \end{minipage}
+ \end{framed}
+
+\column{0.5\textwidth}  
+\begin{framed}
+ \begin{minipage}{0.8\textwidth}
+\begin{figure}[!t]
+\centering
+<<echo=FALSE, fig.width=8, fig.height=8>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p=ggplot(mpg, aes(displ, hwy))+ geom_point(aes(shape=factor(cyl)))+
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+ \end{minipage}
+ \end{framed}
+\end{columns}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Geometric objects in ggplot function}
+A geometric object "x" can be assigned using the structure "\texttt{geom\_x}". Remembering from the qplot function slides, the most common geometries available are : 
+\begin{itemize}
+\item \texttt{geom\_point()}
+\item \texttt{geom\_boxplot()}
+\item \texttt{geom\_histogram()}
+\item \texttt{geom\_density()}
+\item \texttt{geom\_bar()}
+\item \texttt{geom\_line()}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[containsverbatim]{The ggplot function}
+The geometric objects, and other layers can be added sequentially using the "+" connector
+\begin{columns}[t] 
+  \column{0.65\textwidth}
+\begin{minipage}{1\textwidth}
+%\begin{framed}
+\setkeys{Gin}{width=1\textwidth}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=12, fig.height=10>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+p <- p + geom_line() +
+theme(
+axis.title.x = element_text(size=24),
+axis.text.x = element_text(size=24),
+axis.title.y = element_text(size=24, angle = 90),
+axis.text.y = element_text(size=24)
+)
+print(p)
+#print(p + theme_grey(base_size=16))
+@
+\end{figure}
+% \end{framed}
+ \end{minipage}
+\column{0.35\textwidth}
+\begin{minipage}{1\textwidth}
+
+\texttt{p + geom\_point() +}
+
+\texttt{geom\_line()}
+
+\end{minipage}
+\end{columns}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Other useful layers}
+We can control many other parameters of our plot using layers as : 
+\begin{itemize}
+\item \texttt{facet\_grid()} To include more graphs, given a variable, in the same plot.
+\item \texttt{ggtitle("Main title")} To set the main title of the plot.
+\item \texttt{xlab("X label")} 
+\item \texttt{ylab("Y label")} 
+\item \texttt{theme()} To control more aspects of the legend, axis, grid and other from the plot. See help(theme) for details. Use \texttt{+ theme\_bw()} for a white and black theme.
+\item \texttt{annotate("text", label="label", x=x, y=y)} To annotate any "label" in a given (x,y) position of the plot.
+
+\end{itemize}
+\end{frame}
+
+\section{Examples}
+\begin{frame}[containsverbatim]{Example I}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+library(gcookbook) # For the data set
+data= subset(countries, Year==2009 & healthexp>2000)
+sp <- ggplot(data, aes(x=healthexp, y=infmortality))
+sp <- sp + geom_point()
+sp <- sp + geom_text(aes(y=infmortality+.1, label=Name), 
+size=6, vjust=0)
+print(sp)
+@
+\end{frame}
+
+\begin{frame}[containsverbatim]{Example I}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=16, fig.height=10>>=
+#par(cex.axis=2.5, cex.lab=2.5, cex.main=2.5, mar=c(4,5,2,0.2))
+library(gcookbook) # For the data set
+data= subset(countries, Year==2009 & healthexp>2000)
+sp <- ggplot(data, aes(x=healthexp, y=infmortality))
+sp <- sp + geom_point()
+sp <- sp + geom_text(aes(y=infmortality+.1, label=Name), size=6, vjust=0)
+sp <- sp + theme_grey(base_size=24)
+print(sp)
+@
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[containsverbatim]{Example II}
+\begin{small}
+<<echo=TRUE, eval=FALSE, results='hide', fig.keep='none'>>=
+library(gcookbook)
+p <- ggplot(cabbage_exp, aes(x=Date, y=Weight, fill=Cultivar))
+p <- p + geom_bar(stat="identity", position="dodge", width=0.8)
+p <- p + geom_text(aes(label=Weight), vjust=1.5, colour="white",
+            position=position_dodge(.9), size=3)
+print(p)
+@
+\end{small}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Example II}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=16, fig.height=10>>=
+library(gcookbook)
+p <- ggplot(cabbage_exp, aes(x=Date, y=Weight, fill=Cultivar))
+p <- p + geom_bar(stat="identity", position="dodge", width=0.8)
+p <- p + geom_text(aes(label=Weight), vjust=1.5, colour="white",
+            position=position_dodge(.9), size=5)
+p <- p + theme_grey(base_size=24)
+suppressMessages(print(p))
+@
+\end{figure}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Example III}
+\begin{small}
+<<echo=TRUE, results='hide', fig.keep='none'>>=
+ex3=read.table("ex3.txt",head=T)
+p<-ggplot(ex3, aes(x=theta,y=rmse,shape=estimator,col=estimator))
+p<-p+facet_grid(samplesize~model)
+p<-p +  geom_line() + geom_point()
+p<-p + scale_x_continuous(expression(theta))
+p<-p+scale_y_continuous(expression(sqrt(MSE)))
+print(p)
+@
+\end{small}
+\end{frame}
+
+\begin{frame}[containsverbatim]{Example III}
+\begin{figure}[t]
+\centering
+<<echo=FALSE, fig.width=16, fig.height=10>>=
+ex3=read.table("ex3.txt",head=T)
+p<-ggplot(ex3, aes(x=theta,y=rmse,shape=estimator,col=estimator))
+p<-p+facet_grid(samplesize~model)
+p<-p +  geom_line() + geom_point()
+p<-p + scale_x_continuous(expression(theta))
+p<-p+scale_y_continuous(expression(sqrt(MSE)))
+p <- p + theme_grey(base_size=24)
+print(p)
+@
+\end{figure}
+\end{frame}
+
+\begin{frame}[containsverbatim]{And after plotting...}
+
+\begin{itemize}
+\item \textbf{print()}: Render it on screen. This happens automatically when
+running interactively, but inside a loop or function, you'll need to print()it yourself.
+\item \textbf{ggsave():} Render it to disk.  Supports eps/ps, tex (pictex), pdf, jpeg, tiff, png, bmp, svg and wmf (windows only).
+\item \textbf{summary():} Brief description of the structure .
+\item \textbf{save():} Save a cached copy of it to disk.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[containsverbatim]{ggplot2 extensions}
+
+ggplot2 can be extended with other R packages to plot different kind of data, use new themes, etc. Some of the extensions are:
+\begin{itemize}
+\item \textbf{xkcd}: Tries to imitate the style of the xkcd cartoon.
+\item \textbf{ggthemes} Other themes for ggplot, including classic ugly Excel, the economist magazine style, google docs, etc.
+\item \textbf{GGally} Includes network plots, and plot matrix.
+\item \textbf{ggmap} Visualization of spatial data.
+\end{itemize}
+\end{frame}
+
+
+\end{document}
